@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+
+# SPDX-FileCopyrightText: © PL Automation Monitoring GmbH <pl@automation-monitoring.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+# This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
+
+# Empty file to disable the legacy postgres_version check in Checkmk version 2.2

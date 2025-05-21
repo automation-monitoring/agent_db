@@ -1,0 +1,1 @@
+show global status; show global variables;

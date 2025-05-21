@@ -1,0 +1,279 @@
+{'author': 'Philipp Lemke <pl@automation-monitoring.com>',
+ 'description': 'Generic Special Agent for Database monitoring\n'
+                '- with new ora statements and mysql integration\n'
+                '- add support for custom host attributes\n'
+                '- add additional Python Libs\n'
+                '- Version 0.6: without symlinks in build env\n'
+                '- Version 0.6.1: Add Agent DB Stats Check for adv. reporting '
+                'and debug\n'
+                '- Version 0.6.2: Add missing check plugin\n'
+                '- Version 0.6.3: Without cffi library\n'
+                '- Version 0.6.4: Config transferred in yaml file, openssl '
+                'libs excl.\n'
+                '- Version 0.6.5: crypto + pyparser libs removed\n'
+                '- Version 0.6.6: Add Check to measure db connection time for '
+                'oracle & mysql + test new sql statement for oracle pdb '
+                'tablespaces\n'
+                '- Version 0.6.7:  Add Oracle pluggable pkg to wato rule\n'
+                '- Version 0.6.8: Add MySQL stats & statements, remove '
+                'enforced debug output\n'
+                '- Version 0.6.9: Fix sql oracle_logswitches, prevent multiple '
+                'executions of statements, implement optimised '
+                'oracle_tablespaces statement\n'
+                '- Version 0.7.0: Refactor, add new basedb class, fix oracle '
+                'version detection\n'
+                '- Version 0.7.1: Add oracle recovery_status & recovery_area\n'
+                '- Version 0.7.2: Add mssql and logging\n'
+                '- Version 0.7.3: Fix oracle version string detection for '
+                'older oracle versions\n'
+                '- Version 0.7.4: Add DB packages for Oracle RAC and ASM. '
+                'Bugfix oracle_performance Inventory Plugin. Some minor '
+                'changes in mssql agent.\n'
+                '- Version 0.7.5: Verbose logging of db_backend_params \n'
+                '- Version 0.7.6: Support Oracle TNS-Names entries as connect '
+                'strings, fix logging\n'
+                '- Version 0.8.0: Add support for multiple db instances per '
+                'host\n'
+                '- Version 0.8.1: Add mssql availability groups support, add '
+                'check oracle_version2\n'
+                '- Version 0.8.2: Fix oracle version string parsing and add pw '
+                'workaround for password store\n'
+                '- Version 0.9.0: Add cache functionality on statement level '
+                'via parameter "cache_time_min"\n'
+                '- Version 0.9.1: New cachekey generation method and adv. '
+                'debug output\n'
+                '- Version 0.9.2: Improve sql version statement file detection '
+                'and logging\n'
+                '- Version 0.9.3: Add mssql instance support and counters\n'
+                '- Version 0.9.4: Merge mssql_counters feature branch (bad '
+                'version)\n'
+                '- Version 0.9.5: Support custom host attributes generically '
+                'in fields\n'
+                '- Version 0.9.6: Support custom host attributes also in '
+                'backend params, like mssql instance\n'
+                '- Version 0.9.7: New metric db_connect_time with perfometer, '
+                'WATO rule for db_connect_time levels\n'
+                '- Version 0.9.8: Change db_connect_time WATO rule to ms, '
+                'change default levels to 1500 ms / 3000 ms\n'
+                '- Version 0.9.9: Add WATO rule and metrics for '
+                'agent_db_stats\n'
+                '- Version 0.9.10: Harmonize packages in WATO rule for agent, '
+                'make section mssql_tablespaces compatible with check\n'
+                '- Version 0.9.11: Fix Issue #16 - Add method to close '
+                'connections gracefully\n'
+                '- Version 0.9.12: Fix Issue #14 - MSSQL - tablespace check \n'
+                '- Version 0.9.13: Fix Issue #15 - Inconsistent metric names\n'
+                '- Version 0.9.14: Fix broken metrics introduced in 0.9.13\n'
+                '- Version 0.9.15: Add postgres_* sections\n'
+                '- Version 0.9.16: Prototype release for custom_sql testing\n'
+                '- Version 0.9.17: Bugfix in cmk_oracle - print_sql method\n'
+                '- Version 0.9.18: broken version - skip this mkp\n'
+                '- Version 0.9.19: Fix mssql_blocked_sessions\n'
+                '           + Fix mssql_counters for older versions of mssql\n'
+                '           + New check custom_sql_number\n'
+                '           + New check custom_sql_string\n'
+                '- Version 0.9.20: Add custom sql package support\n'
+                '           + Refactor  wato ruleset\n'
+                '- Version 0.9.21: Fix mkp build add wato ruleset '
+                'custom_sql.py again\n'
+                '- Version 0.9.22: Add asm support (beta)\n'
+                '- Version 0.9.23: Honor ipaddress from cmk host '
+                'configuration\n'
+                '- Version 0.9.24: Add version support and statements for '
+                'Postgres\n'
+                '           + Refactor statement version detection\n'
+                '           + Fix ASM multiple execution\n'
+                '           + Add Enforce DNS Lookup\n'
+                '- Version 0.9.25: Add MSSQL version check\n'
+                '- Version 0.9.26: Add general cursor timeout, to prevent '
+                'agent from getting stuck\n'
+                '           + Fix blocked_session delimiter in agent_db.yml\n'
+                '- Version 0.9.27: Add automatic monitoring of all DBs (MSSQL '
+                'only for now)\n'
+                '- Version 0.9.28: agent_db checks further databases if one is '
+                'not reachable or access is denied\n'
+                '- Version 0.9.29: Add login_timeout also for mssql instance '
+                'connection objects\n'
+                '           + DBHandler: Exit when connect to get list of all '
+                'DBs fails\n'
+                '- Version 0.9.30: Implement Feature execution_scope\n'
+                '           + mssql_version: Check target version\n'
+                '- Version 0.9.31: Fix logic to determine execution_scope of a '
+                'statement\n'
+                '           + add db_hostname to db_backend_params and '
+                'strategies as add-on to ip\n'
+                '           + add excution_scope for mssql_blocked_sessions\n'
+                '           + breaking out cache methods from based_db class '
+                'and put them into an own module\n'
+                "           + Change rule title to 'Agent DB Stats' \n"
+                '- Version 0.9.32: Catch exception in check custom_sql_number '
+                'to prevent crash\n'
+                '           + add mssql_version as metric\n'
+                '           + define execution_scope for mssql statements '
+                'where multiple exec per db is not necessary\n'
+                '           + improved exception handling in the event that '
+                'databases are deleted\n'
+                '- Version 0.9.33: New checks postgres_cache_hitratio, '
+                'postgres_txn_wraparound and corresponding agent sections\n'
+                '- Version 0.9.34: Add new sql statements and transform for '
+                'mssql_backup output\n'
+                '           + add mssql_backup.sql\n'
+                '           + add mssql_mirroring.sql\n'
+                '           + add mssql_jobs.sql\n'
+                '- Version 0.9.35: Fix transform for mssql_jobs section\n'
+                '           + add mssql_databases.sql and corresponding '
+                'transform logic\n'
+                '           + fix mssql_backup statement and transform logic\n'
+                '           + add logic to monitor all databases also for '
+                'PostgreSQL\n'
+                '           + capitalize instance in '
+                'postgres_{txn_wraparound,cache_hitratio} item\n'
+                '- Version 0.9.36: Fix transform for mssql_backup if timestamp '
+                'UTC\n'
+                '           + fix connection exception handling\n'
+                '- Version 0.9.37: Split necessary python libs from agent_db '
+                'core code\n'
+                '           + fix type hint import in '
+                'oracle_performance_inventory.py\n'
+                '           + add missing MSSQL statements to metric '
+                'definition\n'
+                '- Version 0.9.38: Fix transform for mssql_jobs\n'
+                '           + provide default cstr for PostgreSQL\n'
+                '           + failed statements message for agent_db_stats: '
+                'fix typos and wording\n'
+                '           + switch back from the custom socket port check to '
+                'the native tcp_connect_timeout\n'
+                '- Version 0.9.39: Add check mssql_maxservermem\n'
+                '- Version 0.9.40: Fix mssql_maxservermem (check, rule, config '
+                'example)\n'
+                '- Version 0.9.41: Carry forward postgres_version '
+                'functionality for Checkmk 2.3\n'
+                '- Version 0.9.42: Fix plugin-breaking bug introduced in '
+                '0.9.41\n'
+                '           + Fix failing discovery on hosts with '
+                'agent_db_stats but without postgres_version\n'
+                '- Version 0.9.43: Include failing statements in logging\n'
+                '           + Fix interpretation of similar statement names as '
+                'versions of one another\n'
+                '           + No longer explicitly include password store '
+                'params in command line arguments\n'
+                '           + Fix broken password store functionality for '
+                'Oracle ASM\n'
+                '- Version 0.9.44: Fix bug breaking the entire Oracle ASM '
+                'functionality introduced in 0.9.43\n'
+                '- Version 0.9.45: Fix yet another issue breaking Oracle ASM '
+                'functionality\n'
+                '           + Fix postgres_sessions issue always showing '
+                'running sessions equal to total sessions in some setups\n'
+                '           + Add missing metric '
+                'query_runtime_mssql_maxservermem\n',
+ 'download_url': '',
+ 'files': {'agent_based': ['agent_db_stats.py',
+                           'agent_db_connect.py',
+                           'oracle_performance_inventory.py',
+                           'oracle_version_v2.py',
+                           'custom_sql.py',
+                           'mssql_version.py',
+                           'postgres_cache_hitratio.py',
+                           'postgres_txn_wraparound.py',
+                           'postgres_version.py',
+                           'mssql_maxservermem.py'],
+           'agents': ['db/mysql/sql/mysql_capacity.sql',
+                      'db/mysql/sql/mysql_slaves.sql',
+                      'db/oracle/sql/oracle_dataguard_stats_121.sql',
+                      'db/oracle/sql/oracle_instance.sql',
+                      'db/oracle/sql/oracle_instance_121.sql',
+                      'db/oracle/sql/oracle_jobs_121.sql',
+                      'db/oracle/sql/oracle_locks_102.sql',
+                      'db/oracle/sql/oracle_locks_121.sql',
+                      'db/oracle/sql/oracle_logswitches.sql',
+                      'db/oracle/sql/oracle_longactivesessions_121.sql',
+                      'db/oracle/sql/oracle_longterm_statement_10.sql',
+                      'db/oracle/sql/oracle_longterm_statement_15.sql',
+                      'db/oracle/sql/oracle_longterm_statement_5.sql',
+                      'db/oracle/sql/oracle_performance_121.sql',
+                      'db/oracle/sql/oracle_processes.sql',
+                      'db/oracle/sql/oracle_rman_121.sql',
+                      'db/oracle/sql/oracle_sessions.sql',
+                      'db/oracle/sql/oracle_sessions_121.sql',
+                      'db/oracle/sql/oracle_systemparameter.sql',
+                      'db/oracle/sql/oracle_tablespaces_121.sql',
+                      'db/oracle/sql/oracle_tablespaces_92.sql',
+                      'db/oracle/sql/oracle_undostat_102.sql',
+                      'db/oracle/sql/oracle_undostat_121.sql',
+                      'db/oracle/sql/oracle_undostat_92.sql',
+                      'db/oracle/sql/oracle_version.sql',
+                      'special/agent_db',
+                      'db/mysql/sql/mysql_global.sql',
+                      'db/mysql/sql/mysql_threads_connected.sql',
+                      'db/oracle/sql/oracle_recovery_area.sql',
+                      'db/oracle/sql/oracle_recovery_status_121.sql',
+                      'db/oracle/sql/oracle_recovery_status_92.sql',
+                      'db/mssql/sql/mssql_blocked_sessions.sql',
+                      'db/mssql/sql/mssql_connections.sql',
+                      'db/mssql/sql/mssql_version.sql',
+                      'db/mssql/sql/mssql_tablespaces.sql',
+                      'db/mssql/sql/mssql_datafiles.sql',
+                      'db/mssql/sql/mssql_transactionlogs.sql',
+                      'db/oracle/sql/oracle_asm_diskgroup_101.sql',
+                      'db/oracle/sql/oracle_asm_diskgroup_112.sql',
+                      'db/mssql/sql/mssql_availability_groups.sql',
+                      'db/oracle/sql/oracle_custom_statement.sql',
+                      'db/oracle/sql/oracle_dataguard_stats_102.sql',
+                      'db/oracle/sql/oracle_instance_180.sql',
+                      'db/oracle/sql/oracle_instance_92.sql',
+                      'db/oracle/sql/oracle_jobs_102.sql',
+                      'db/oracle/sql/oracle_longactivesessions_101.sql',
+                      'db/oracle/sql/oracle_performance_101.sql',
+                      'db/oracle/sql/oracle_rman_102.sql',
+                      'db/oracle/sql/oracle_rman_122.sql',
+                      'db/oracle/sql/oracle_sessions_92.sql',
+                      'db/mssql/sql/mssql_counters.sql',
+                      'db/mssql/sql/mssql_databases.sql',
+                      'db/oracle/sql/oracle_recovery_status_101.sql',
+                      'db/postgres/sql/postgres_bloat.sql',
+                      'db/postgres/sql/postgres_connections.sql',
+                      'db/postgres/sql/postgres_sessions.sql',
+                      'db/postgres/sql/postgres_query_duration.sql',
+                      'db/postgres/sql/postgres_stats.sql',
+                      'db/postgres/sql/postgres_version.sql',
+                      'db/postgres/sql/postgres_locks.sql',
+                      'db/postgres/sql/postgres_stat_database.sql',
+                      'db/mysql/sql/mysql_count_databases.sql',
+                      'db/mysql/sql/mysql_table_comments.sql',
+                      'db/postgres/sql/postgres_cus_count_tables.sql',
+                      'db/postgres/sql/postgres_select_cities.sql',
+                      'db/postgres/sql/postgres_bloat_9.1.sql',
+                      'db/postgres/sql/postgres_query_duration_9.3.sql',
+                      'db/postgres/sql/postgres_sessions_9.3.sql',
+                      'db/postgres/sql/postgres_cache_hitratio.sql',
+                      'db/postgres/sql/postgres_txn_wraparound.sql',
+                      'db/mssql/sql/mssql_backup.sql',
+                      'db/mssql/sql/mssql_jobs.sql',
+                      'db/mssql/sql/mssql_mirroring.sql',
+                      'db/mssql/sql/mssql_maxservermem.sql'],
+           'checks': ['agent_db', 'postgres_version'],
+           'lib': ['python3/cmk/special_agents/agent_db.py',
+                   'python3/cmk/special_agents/db/cmk_mysql.py',
+                   'python3/cmk/special_agents/db/cmk_oracle.py',
+                   'python3/cmk/special_agents/db/cmk_postgres.py',
+                   'python3/cmk/special_agents/db/basedb.py',
+                   'python3/cmk/special_agents/db/cmk_mssql.py',
+                   'python3/cmk/special_agents/db/cache.py'],
+           'web': ['plugins/wato/agent_db.py',
+                   'plugins/wato/agent_db_stats.py',
+                   'plugins/wato/db_connection_time.py',
+                   'plugins/metrics/db_connect_time.py',
+                   'plugins/metrics/agent_db_stats.py',
+                   'plugins/wato/custom_sql.py',
+                   'plugins/wato/mssql_version.py',
+                   'plugins/metrics/postgres_txn_wraparound.py',
+                   'plugins/wato/postgres_cache_hitratio.py',
+                   'plugins/wato/postgres_txn_wraparound.py',
+                   'plugins/wato/mssql_maxservermem.py']},
+ 'name': 'agent_db',
+ 'title': 'Special Agent DB',
+ 'version': '0.9.45',
+ 'version.min_required': '2.2.0p1',
+ 'version.packaged': '2.2.0p36',
+ 'version.usable_until': None}

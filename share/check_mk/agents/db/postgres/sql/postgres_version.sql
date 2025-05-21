@@ -1,0 +1,1 @@
+SELECT version() AS v

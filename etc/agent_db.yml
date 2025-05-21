@@ -1,0 +1,304 @@
+# Default packages -> available for all backends:
+#    - basic
+#    - standard
+#    - performance
+#    - custom_a
+#    - custom_b
+#    - custom_c
+
+# Timeout in seconds to open a cursor to a database
+# Agent_db exits with a timeout error if the cursor can't be opened in time no statement is executed
+db_cursor_timeout_sec: 2
+
+cmk_oracle:
+  default_separator: sep(124)
+  default_timeout_sec: 12
+# Oracle specific packages:
+#    - oracle_pdb
+#    - oracle_rac_inst
+#    - oracle_rac_db
+#    - oracle_asm
+
+  # Oracle statements
+  statement_desc:
+    oracle_asm_diskgroup:
+      asm_logon: true
+      packages:
+        - basic
+        - oracle_asm
+
+    oracle_tablespaces:
+      cache_time_min: 30
+      timeout_sec: 3
+      packages:
+        - basic
+        - standard
+        - oracle_rac_db
+    oracle_performance:
+      timeout_sec: 3
+      packages:
+        - performance
+        - oracle_rac_inst
+    oracle_rman:
+      cache_time_min: 10
+      packages:
+        - standard
+        - oracle_rac_inst
+    oracle_undostat:
+      packages:
+        - standard
+        - oracle_rac_inst
+    oracle_instance:
+      packages:
+        - standard
+        - oracle_rac_inst
+    oracle_sessions:
+      packages:
+        - standard
+        - oracle_rac_inst
+    oracle_logswitches:
+      packages:
+        - standard
+        - oracle_rac_inst
+    oracle_processes:
+      packages:
+        - standard
+        - oracle_rac_inst
+
+    oracle_longactivesessions:
+      packages:
+        - standard
+    oracle_dataguard_stats:
+      packages:
+        - standard
+    oracle_locks:
+      packages:
+        - standard
+        - oracle_rac_inst
+
+    oracle_recovery_area:
+      packages:
+        - standard
+        - oracle_rac_inst
+
+    oracle_recovery_status:
+      packages:
+        - standard
+        - oracle_rac_inst
+
+    oracle_custom_statement:
+      packages:
+        - standard
+
+
+cmk_mssql:
+  default_separator: sep(124)
+  default_timeout_sec: 5
+
+  # MSSQL statements
+  statement_desc:
+    mssql_tablespaces:
+      separator: null
+      packages: [basic, standard]
+
+    mssql_blocked_sessions:
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_connections:
+      separator: null
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_transactionlogs:
+      packages: [standard]
+
+    mssql_version:
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_datafiles:
+      packages: [standard]
+
+    mssql_counters:
+      packages: [standard, performance]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_maxservermem:
+      packages: [performance]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_availability_groups:
+      separator: null
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_backup:
+      #separator: null
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_mirroring:
+      separator: sep(09)
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_jobs:
+      #separator: null
+      packages: [standard]
+      execution_scope:
+        connection_string:
+          - msdb
+
+    mssql_databases:
+      separator: sep(0)
+      packages: [basic, standard]
+      execution_scope:
+        connection_string:
+          - master
+
+    mssql_count_company_employees:
+      separator: sep(0)
+      check_header: custom_sql
+      item: Count Employees
+      timeout_sec: 2
+      type: number
+      metric: employees
+      unit: Emp. of STARK INDUSTRIES
+      packages: [stark_industries]
+      execution_scope:
+        connection_string:
+          - master
+ 
+
+cmk_mysql:
+  default_separator: null
+  # MySQL statements
+  statement_desc:
+    mysql_capacity:
+      timeout_sec: 2
+      packages:
+        - basic
+        - standard
+    mysql_slaves:
+      timeout_sec: 2
+      packages:
+        - basic
+        - standard
+    mysql_threads_connected:
+      timeout_sec: 2
+      packages:
+        - basic
+        - standard
+    mysql_global:
+      check_header: mysql
+      timeout_sec: 2
+      packages:
+        - basic
+        - standard
+
+    mysql_count_databases:
+      separator: sep(0)
+      check_header: custom_sql
+      item: Count Databases
+      timeout_sec: 2
+      type: number
+      metric: dbs
+      packages: [basic]
+
+    mysql_table_comments:
+      separator: sep(0)
+      check_header: custom_sql
+      item: Table Comments
+      timeout_sec: 2
+      unit: string
+      packages: [basic]
+
+cmk_postgres:
+  default_separator: sep(59)
+
+  # Postgres statements
+  statement_desc:
+    postgres_stat_database:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_locks:
+      timeout_sec: 2
+      packages:
+        - basic
+        - standard
+    postgres_query_duration:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_sessions:
+      separator: null
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_connections:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_version:
+      separator: sep(1)
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_bloat:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_stats:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_cache_hitratio:
+      timeout_sec: 2
+      packages:
+        - basic
+    postgres_txn_wraparound:
+      timeout_sec: 2
+      packages:
+        -basic
+    postgres_cus_count_tables:
+      separator: sep(0)
+      check_header: custom_sql
+      item: Count Tables
+      timeout_sec: 2
+      type: number
+      metric: tables
+      packages:
+        - basic
+
+    postgres_select_cities:
+      separator: sep(0)
+      check_header: custom_sql
+      #has_header_row: true
+      # if a item is defined, item_prefix, item_column, value_column are ignored
+      item: City population
+      #item_prefix: City
+      #item_column: name
+      #value_column: population
+      timeout_sec: 2
+      type: number
+      metric: population
+      packages:
+        - basic

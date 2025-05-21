@@ -1,0 +1,3 @@
+SELECT TABLE_COMMENT 
+FROM information_schema.TABLES 
+WHERE TABLE_SCHEMA = 'mysql';
