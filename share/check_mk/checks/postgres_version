@@ -6,3 +6,4 @@
 # This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
 
 # Empty file to disable the legacy postgres_version check in Checkmk version 2.2
+# Test
