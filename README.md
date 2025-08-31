@@ -1,6 +1,8 @@
 # Database Special Agent
 Agent DB is a Checkmk special agent that enables direct monitoring of various database systems via network connections—without the need to deploy any Checkmk agent plugin on the database hosts.
 
+[Getting-started]([https://github.com/automation-monitoring/agent_db/wiki/Getting-started)
+
 ## 🔍 Overview
 This special agent can simplify monitoring setups by directly connecting to supported databases over the network. It leverages custom host attributes for flexible configuration and clean integration into Checkmk environments.
 
