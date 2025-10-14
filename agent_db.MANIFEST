@@ -166,7 +166,9 @@
                 '           + Fix postgres_sessions issue always showing '
                 'running sessions equal to total sessions in some setups\n'
                 '           + Add missing metric '
-                'query_runtime_mssql_maxservermem\n',
+                'query_runtime_mssql_maxservermem\n'
+                '- Version 0.10.1: Intermediary migration step: Server Side '
+                'Call and Special Agent rule migrated\n',
  'download_url': '',
  'files': {'agent_based': ['agent_db_stats.py',
                            'agent_db_connect.py',
@@ -252,7 +254,9 @@
                       'db/mssql/sql/mssql_jobs.sql',
                       'db/mssql/sql/mssql_mirroring.sql',
                       'db/mssql/sql/mssql_maxservermem.sql'],
-           'checks': ['agent_db', 'postgres_version'],
+           'checks': ['postgres_version'],
+           'cmk_addons_plugins': ['agent_db/rulesets/agent_db.py',
+                                  'agent_db/server_side_calls/agent_db.py'],
            'lib': ['python3/cmk/special_agents/agent_db.py',
                    'python3/cmk/special_agents/db/cmk_mysql.py',
                    'python3/cmk/special_agents/db/cmk_oracle.py',
@@ -260,8 +264,7 @@
                    'python3/cmk/special_agents/db/basedb.py',
                    'python3/cmk/special_agents/db/cmk_mssql.py',
                    'python3/cmk/special_agents/db/cache.py'],
-           'web': ['plugins/wato/agent_db.py',
-                   'plugins/wato/agent_db_stats.py',
+           'web': ['plugins/wato/agent_db_stats.py',
                    'plugins/wato/db_connection_time.py',
                    'plugins/metrics/db_connect_time.py',
                    'plugins/metrics/agent_db_stats.py',
@@ -273,7 +276,7 @@
                    'plugins/wato/mssql_maxservermem.py']},
  'name': 'agent_db',
  'title': 'Special Agent DB',
- 'version': '0.9.45',
- 'version.min_required': '2.2.0p1',
- 'version.packaged': '2.2.0p36',
- 'version.usable_until': None}
+ 'version': '0.10.1',
+ 'version.min_required': '2.3.0p1',
+ 'version.packaged': '2.3.0p27',
+ 'version.usable_until': '2.3.0p50'}
