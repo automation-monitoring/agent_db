@@ -168,7 +168,9 @@
                 '           + Add missing metric '
                 'query_runtime_mssql_maxservermem\n'
                 '- Version 0.10.1: Intermediary migration step: Server Side '
-                'Call and Special Agent rule migrated\n',
+                'Call and Special Agent rule migrated\n'
+                '- Version 0.10.2: Pass passwords securely, fix crash when no '
+                'logging is set\n',
  'download_url': '',
  'files': {'agent_based': ['agent_db_stats.py',
                            'agent_db_connect.py',
@@ -253,9 +255,9 @@
                       'db/mssql/sql/mssql_jobs.sql',
                       'db/mssql/sql/mssql_mirroring.sql',
                       'db/mssql/sql/mssql_maxservermem.sql'],
-           'checks': [],
            'cmk_addons_plugins': ['agent_db/rulesets/agent_db.py',
-                                  'agent_db/server_side_calls/agent_db.py'],
+                                  'agent_db/server_side_calls/agent_db.py',
+                                  'agent_db/agent_based/postgres_version.py'],
            'lib': ['python3/cmk/special_agents/agent_db.py',
                    'python3/cmk/special_agents/db/cmk_mysql.py',
                    'python3/cmk/special_agents/db/cmk_oracle.py',
@@ -275,7 +277,7 @@
                    'plugins/wato/mssql_maxservermem.py']},
  'name': 'agent_db',
  'title': 'Special Agent DB',
- 'version': '0.10.1',
+ 'version': '0.10.2',
  'version.min_required': '2.3.0p1',
  'version.packaged': '2.3.0p27',
  'version.usable_until': '2.3.0p50'}
