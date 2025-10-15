@@ -17,7 +17,7 @@ from cmk.server_side_calls.v1 import (
 
 
 def generate_agent_db_commands(params, host_config):
-    password_arg = params["password"].unsafe()
+    password_arg = params["password"]
 
     # Build dict to later dump to b64. We need to deepcopy here,
     # because modifying params leads to errors when this function
@@ -32,7 +32,7 @@ def generate_agent_db_commands(params, host_config):
     if params_b64["db_backend"][0] == "cmk_oracle":
         oracle_params = params_b64["db_backend"][1]
         if "asm_credentials" in oracle_params:
-            asm_pw = oracle_params["asm_credentials"]["asm_password"].unsafe()
+            asm_pw = oracle_params["asm_credentials"]["asm_password"]
             del oracle_params["asm_credentials"]["asm_password"]
 
     # Dump params to JSON and serialize to a base64 string

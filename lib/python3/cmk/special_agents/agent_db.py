@@ -15,8 +15,9 @@ import requests
 import yaml
 import pprint
 import logging
+import pathlib
 
-import cmk.utils.password_store
+from cmk.utils import password_store
 
 
 def _get_automation_secret(username="automation"):
@@ -363,10 +364,14 @@ class DBHandler:
             strategy.close_db_connection()
 
 
+def lookup_password_arg(pw_arg):
+    pw_id, pw_file = pw_arg.split(":", maxsplit=1)
+    return password_store.lookup(pathlib.Path(pw_file), pw_id)
+
+
 def main():
     """Main function"""
 
-    cmk.utils.password_store.replace_passwords()
 
     parser = argparse.ArgumentParser(description="Checkmk DB Special Agent")
     parser.add_argument(
@@ -409,11 +414,11 @@ def main():
         params = deserialize_agent_db_arguments(args.base64args)
 
     if args.password:
-        params["password"] = args.password
+        params["password"] = lookup_password_arg(args.password)
 
     if args.asm_password:
         if "asm_credentials" in params["db_backend"][1]:
-            params["db_backend"][1]["asm_credentials"]["asm_password"] = args.asm_password
+            params["db_backend"][1]["asm_credentials"]["asm_password"] = lookup_password_arg(args.asm_password)
 
     if args.hostname:
         hostname = args.hostname
