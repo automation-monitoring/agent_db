@@ -36,7 +36,7 @@ class AgentDBLog:
         """Initialize logging"""
         self.loglevel = loglevel
         self.log = logging.getLogger(__name__)
-        if loglevel is not None:
+        if loglevel != "none":
             self.log.setLevel(self.loglevel.upper())
         else:
             logging.disable()
