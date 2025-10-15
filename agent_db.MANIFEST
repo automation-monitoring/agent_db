@@ -254,7 +254,7 @@
                       'db/mssql/sql/mssql_jobs.sql',
                       'db/mssql/sql/mssql_mirroring.sql',
                       'db/mssql/sql/mssql_maxservermem.sql'],
-           'checks': ['postgres_version'],
+           'checks': [],
            'cmk_addons_plugins': ['agent_db/rulesets/agent_db.py',
                                   'agent_db/server_side_calls/agent_db.py'],
            'lib': ['python3/cmk/special_agents/agent_db.py',
