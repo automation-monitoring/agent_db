@@ -178,7 +178,6 @@
                            'mssql_version.py',
                            'postgres_cache_hitratio.py',
                            'postgres_txn_wraparound.py',
-                           'postgres_version.py',
                            'mssql_maxservermem.py'],
            'agents': ['db/mysql/sql/mysql_capacity.sql',
                       'db/mysql/sql/mysql_slaves.sql',

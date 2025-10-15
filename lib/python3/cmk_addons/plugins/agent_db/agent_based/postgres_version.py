@@ -12,7 +12,7 @@
 # To include the functionality of postgres_version also for 2.3 and up, we add
 # this check that only discovers services if the section agent_db_stats is not empty (ie it's agent_db)
 
-from .agent_based_api.v1 import Result, State, Service, register
+from cmk.agent_based.v2 import Result, State, Service, CheckPlugin
 
 # Checkmk 2.3 no longer has the file postgres_version.py, but rather
 # defines this section together with postgres_instances
@@ -34,7 +34,7 @@ def check_postgres_version(item, section_postgres_version, section_agent_db_stat
     yield Result(state=State.OK, summary=data)
 
 
-register.check_plugin(
+check_plugin_postgres_version = CheckPlugin(
     name="postgres_version",
     sections=["postgres_version", "agent_db_stats"],
     service_name="PostgreSQL Version %s",
