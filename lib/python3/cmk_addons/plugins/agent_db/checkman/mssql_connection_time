@@ -1,0 +1,20 @@
+title: MSSQL: Database Connection Time
+agents: agent_db
+catalog: app/mssql
+license: GPL-3.0-or-later
+distribution: check_mk
+description:
+ This check monitors the time it takes to establish a connection to a Microsoft SQL Server database.
+ The connection time is measured from the moment the connection is requested until
+ the database responds with a successful connection.
+
+ {WARN} and {CRIT} thresholds for the connection time can be configured.
+ Default thresholds are 1.5 seconds for warning and 3.0 seconds for critical.
+
+ This check requires the agent_db special agent to be configured.
+
+item:
+ Name of the database connection string
+
+discovery:
+ One service is created for each MSSQL database connection.
