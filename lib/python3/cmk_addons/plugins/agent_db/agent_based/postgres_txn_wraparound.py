@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 
-from cmk.base.plugins.agent_based.agent_based_api.v1 import (
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    check_levels,
     Service,
     State,
     Metric,
     Result,
-    register,
+    render,
 )
 
 
@@ -28,7 +31,7 @@ def parse_postgres_txn_wraparound(string_table):
     return section
 
 
-register.agent_section(
+agent_section_postgres_txn_wraparound = AgentSection(
     name="postgres_txn_wraparound",
     parse_function=parse_postgres_txn_wraparound,
 )
@@ -42,28 +45,21 @@ def discover_postgres_txn_wraparound(section):
 def check_postgres_txn_wraparound(item, params, section):
     unfrozen_txns = section[item]
     levels = params.get("unfrozen_txns")
-    infotext = f"{unfrozen_txns} XIDs"
-    yield Metric("unfrozen_txns", unfrozen_txns, levels=levels)
-    if levels:
-        warn, crit = levels
-        levelstext = f" (warn/crit at {warn}/{crit})"
-        if unfrozen_txns >= crit:
-            yield Result(state=State.CRIT, summary=infotext + levelstext)
-        elif unfrozen_txns >= warn:
-            yield Result(state=State.WARN, summary=infotext + levelstext)
-        else:
-            yield Result(state=State.OK, summary=infotext)
-    else:
-        yield Result(state=State.OK, summary=infotext)
+    yield from check_levels(
+                value=unfrozen_txns,
+                levels_upper=params.get("unfrozen_txns"),
+                metric_name="unfrozen_txns",
+                render_func=lambda v: f"{v} XIDs",
+            )
 
 
-register.check_plugin(
+check_plugin_postgres_txn_wraparound = CheckPlugin(
     name="postgres_txn_wraparound",
     service_name="PostgreSQL Transaction Wraparound %s",
     discovery_function=discover_postgres_txn_wraparound,
     check_function=check_postgres_txn_wraparound,
     check_default_parameters={
-        "unfrozen_txns" : (1300000000, 1400000000)
+        "unfrozen_txns" : ("fixed", (1300000000, 1400000000)),
     },
     check_ruleset_name="postgres_txn_wraparound",
 )
