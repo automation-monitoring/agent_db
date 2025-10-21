@@ -6,9 +6,6 @@ from cmk.agent_based.v2 import (
     CheckPlugin,
     check_levels,
     Service,
-    State,
-    Metric,
-    Result,
     render,
 )
 
