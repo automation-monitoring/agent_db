@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
-from .agent_based_api.v1 import Result, State, Service, register
+from cmk.agent_based.v2 import CheckPlugin, Result, State, Service
 
 MSSQL_VERSION_MAPPING = {
     "8": "2000",
@@ -54,7 +54,7 @@ def check_mssql_version(params, section):
         yield Result(state=State.OK, summary=summary)
 
 
-register.check_plugin(
+check_plugin_mssql_version = CheckPlugin(
     name="mssql_version",
     service_name="MSSQL Version",
     discovery_function=discover_mssql_version,
