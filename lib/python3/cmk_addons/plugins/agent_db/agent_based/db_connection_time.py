@@ -84,6 +84,8 @@ def check_db_connection_time(item, params, section):
     levels = params["db_cursor_avail_sec"]
 
     # Check connection time against levels
+    # Example for data
+    # {'connection_time': 0.006552696228027344, 'error': None}
     yield from check_levels(
         data["connection_time"],
         metric_name="db_connect_time",
