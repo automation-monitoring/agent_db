@@ -5,45 +5,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
 
-from collections.abc import Mapping
-from dataclasses import dataclass
-from typing import Optional, TypedDict
-
 from cmk.agent_based.v2 import (
     AgentSection,
     check_levels,
     CheckPlugin,
-    CheckResult,
-    DiscoveryResult,
-    LevelsT,
     render,
     Result,
     Service,
     State,
-    StringTable,
 )
 
 import json
 
 
-@dataclass(frozen=True)
-class DbConnectionData:
-    connection_time: float
-    error: Optional[str] = None
-
-
-Section = Mapping[str, DbConnectionData]
-
-
-def parse_db_connection_time(string_table: StringTable) -> Section:
+def parse_db_connection_time(string_table):
     """Parse database connection time data from agent output.
-    
+
     Example data:
         [['{"db_cstr":', '"projdat",', '"connection_time":', '0.008624076843261719,', '"error":', 'null}'],
          ['{"db_cstr":', '"master",', '"connection_time":', '0.006785392761230469,', '"error":', 'null}']]
     """
-    parsed: dict[str, DbConnectionData] = {}
-    
+    parsed = {}
+
     for line in string_table:
         try:
             # Join the fragmented JSON string
@@ -55,16 +38,16 @@ def parse_db_connection_time(string_table: StringTable) -> Section:
             db_name = loaded_data["db_cstr"]
             connection_time = float(loaded_data["connection_time"])
             error = loaded_data.get("error")
-            
+
             # Store None instead of null string
             if error == "null" or error is None:
                 error = None
 
             # Store the data in the result dictionary
-            parsed[db_name] = DbConnectionData(
-                connection_time=connection_time,
-                error=error,
-            )
+            parsed[db_name] = {
+                "connection_time": connection_time,
+                "error": error,
+            }
         except (json.JSONDecodeError, KeyError, ValueError):
             # Skip malformed entries
             continue
@@ -72,17 +55,13 @@ def parse_db_connection_time(string_table: StringTable) -> Section:
     return parsed
 
 
-def discover_db_connection_time(section: Section) -> DiscoveryResult:
+def discover_db_connection_time(section):
     """Discover a service for each database."""
     for db_cstr in section:
         yield Service(item=db_cstr)
 
 
-class Params(TypedDict):
-    db_cursor_avail_sec: LevelsT[float]
-
-
-def check_db_connection_time(item: str, params: Params, section: Section) -> CheckResult:
+def check_db_connection_time(item, params, section):
     """Check database connection time against thresholds."""
     if item not in section:
         yield Result(
@@ -92,21 +71,23 @@ def check_db_connection_time(item: str, params: Params, section: Section) -> Che
         return
 
     data = section[item]
-    
+
     # Check for connection errors first
-    if data.error:
+    if data.get("error"):
         yield Result(
             state=State.CRIT,
             summary=f"Unable to connect to database {item}",
-            details=str(data.error),
+            details=str(data["error"]),
         )
         return
 
+    levels = params["db_cursor_avail_sec"]
+
     # Check connection time against levels
     yield from check_levels(
-        data.connection_time,
+        data["connection_time"],
         metric_name="db_connect_time",
-        levels_upper=params["db_cursor_avail_sec"],
+        levels_upper=levels,
         label="Connection time",
         render_func=render.timespan,
     )
@@ -141,7 +122,7 @@ check_plugin_mssql_connection_time = CheckPlugin(
     discovery_function=discover_db_connection_time,
     check_function=check_db_connection_time,
     check_ruleset_name="db_connection_time",
-    check_default_parameters={"db_cursor_avail_sec": ("fixed",(1.5, 3.0))},
+    check_default_parameters={"db_cursor_avail_sec": ("fixed", (1.5, 3.0))},
 )
 
 check_plugin_mysql_connection_time = CheckPlugin(
@@ -150,7 +131,7 @@ check_plugin_mysql_connection_time = CheckPlugin(
     discovery_function=discover_db_connection_time,
     check_function=check_db_connection_time,
     check_ruleset_name="db_connection_time",
-    check_default_parameters={"db_cursor_avail_sec": ("fixed",(1.5, 3.0))},
+    check_default_parameters={"db_cursor_avail_sec": ("fixed", (1.5, 3.0))},
 )
 
 check_plugin_oracle_connection_time = CheckPlugin(
@@ -159,7 +140,7 @@ check_plugin_oracle_connection_time = CheckPlugin(
     discovery_function=discover_db_connection_time,
     check_function=check_db_connection_time,
     check_ruleset_name="db_connection_time",
-    check_default_parameters={"db_cursor_avail_sec": ("fixed",(1.5, 3.0))},
+    check_default_parameters={"db_cursor_avail_sec": ("fixed", (1.5, 3.0))},
 )
 
 check_plugin_postgres_connection_time = CheckPlugin(
@@ -168,5 +149,5 @@ check_plugin_postgres_connection_time = CheckPlugin(
     discovery_function=discover_db_connection_time,
     check_function=check_db_connection_time,
     check_ruleset_name="db_connection_time",
-    check_default_parameters={"db_cursor_avail_sec": ("fixed",(1.5, 3.0))},
+    check_default_parameters={"db_cursor_avail_sec": ("fixed", (1.5, 3.0))},
 )
