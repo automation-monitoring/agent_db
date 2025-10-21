@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
 
-from cmk.base.plugins.agent_based.agent_based_api.v1 import (
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    check_levels,
     Service,
     State,
     Metric,
     Result,
-    register,
+    render,
 )
 
 
@@ -30,7 +33,7 @@ def parse_postgres_cache_hitratio(string_table):
     return section
 
 
-register.agent_section(
+agent_section_postgres_cache_hitratio = AgentSection(
     name="postgres_cache_hitratio",
     parse_function=parse_postgres_cache_hitratio,
 )
@@ -43,23 +46,15 @@ def discover_postgres_cache_hitratio(section):
 
 def check_postgres_cache_hitratio(item, params, section):
     hitratio = section[item]
-    infotext = f"{hitratio:.2f}%"
-    levels = params.get("levels_lower")
-    yield Metric("data_hitratio", hitratio, levels=levels)
-    if levels:
-        warn, crit = levels
-        levelstext = f" (warn/crit below {warn:.2f}%/{crit:.2f}%)"
-        if hitratio < crit:
-            yield Result(state=State.CRIT, summary=infotext + levelstext)
-        elif hitratio < warn:
-            yield Result(state=State.WARN, summary=infotext + levelstext)
-        else:
-            yield Result(state=State.OK, summary=infotext)
-    else:
-        yield Result(state=State.OK, summary=infotext)
+    yield from check_levels(
+                value=hitratio,
+                levels_lower=params.get("levels_lower"),
+                metric_name="data_hitratio",
+                render_func=render.percent,
+            )
 
 
-register.check_plugin(
+check_plugin_postgres_cache_hitratio = CheckPlugin(
     name="postgres_cache_hitratio",
     service_name="PostgreSQL Cache Hitratio %s",
     discovery_function=discover_postgres_cache_hitratio,
