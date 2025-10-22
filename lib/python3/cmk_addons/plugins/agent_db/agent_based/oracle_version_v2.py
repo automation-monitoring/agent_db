@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
-# from .agent_based_api.v1 import Result, State, Service, Metric, register
-from cmk.base.plugins.agent_based.agent_based_api.v1 import (
+
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    Metric,
     Result,
     State,
     Service,
-    Metric,
-    register,
 )
 
 
@@ -40,7 +41,7 @@ def parse_oracle_version_v2(string_table):
     return ret
 
 
-register.agent_section(
+agent_section_oracle_version_v2 = AgentSection(
     name="oracle_version_v2",
     parse_function=parse_oracle_version_v2,
 )
@@ -72,13 +73,9 @@ def check_oracle_version_v2(item, section):
             yield Result(state=state, summary=version)
 
 
-register.check_plugin(
+check_plugin_oracle_version_v2 = CheckPlugin(
     name="oracle_version_v2",
-    # sections=["oracle_version_v2"],
     service_name="ORA %s Oracle Version",
     discovery_function=discover_oracle_version_v2,
     check_function=check_oracle_version_v2,
-    # check_default_parameters=defaults_oracle_version_v2,
-    # check_default_parameters=None,
-    # check_ruleset_name="oracle_version_v2",
 )
