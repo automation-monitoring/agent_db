@@ -4,11 +4,16 @@
 # SPDX-FileCopyrightText: © PL Automation Monitoring GmbH <pl@automation-monitoring.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 # This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
-from .agent_based_api.v1 import Result, State, Service, Metric, register
 
-import pprint
 
-defaults_mssql_maxservermem = {}
+from cmk.agent_based.v2 import (
+    AgentSection,
+    CheckPlugin,
+    Service,
+    State,
+    Result,
+)
+
 
 
 def parse_mssql_maxservermem(string_table):
@@ -18,7 +23,7 @@ def parse_mssql_maxservermem(string_table):
     return {"value": int(val), "description": desc}
 
 
-register.agent_section(
+agent_section_mssql_maxservermem = AgentSection(
     name="mssql_maxservermem",
     parse_function=parse_mssql_maxservermem,
 )
@@ -48,12 +53,11 @@ def check_mssql_maxservermem(params, section):
     yield Result(state=state, summary=summary)
 
 
-register.check_plugin(
+check_plugin_mssql_maxservermem = CheckPlugin(
     name="mssql_maxservermem",
-    sections=["mssql_maxservermem"],
     service_name="MSSQL Max Server Memory",
     discovery_function=discover_mssql_maxservermem,
     check_function=check_mssql_maxservermem,
-    check_default_parameters=defaults_mssql_maxservermem,
+    check_default_parameters={},
     check_ruleset_name="mssql_maxservermem",
 )
