@@ -1,24 +1,29 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8; py-indent-offset: 4 -*-
-# from .agent_based_api.v1 import Result, State, Service, Metric, register
+
+# SPDX-FileCopyrightText: © PL Automation Monitoring GmbH <pl@automation-monitoring.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+# This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
+
 import json
 import re
 import pprint
 import traceback
-from cmk.base.plugins.agent_based.agent_based_api.v1 import (
+
+from cmk.agent_based.v2 import (
+    AgentSection,
     check_levels,
+    CheckPlugin,
     Result,
-    State,
     Service,
-    Metric,
-    register,
+    State,
 )
 
 
 def parse_custom_sql(string_table):
+    """Parse custom SQL results from agent output."""
     ret = {}
     for checkresult in string_table:
-        # pprint.pprint(checkresult)
         json_content = json.loads(checkresult[0])
         if "item" not in json_content:
             # Multiple values per query are not supported yet
@@ -28,7 +33,8 @@ def parse_custom_sql(string_table):
     return ret
 
 
-register.agent_section(
+# Register agent section
+agent_section_custom_sql = AgentSection(
     name="custom_sql",
     parse_function=parse_custom_sql,
 )
@@ -53,19 +59,23 @@ def discover_custom_sql_string(section):
 
 
 def check_custom_sql_string(item, params, section):
-    try:
-        checkdata = section[item]
-    except KeyError:
+    """Check custom SQL string results."""
+    if item not in section:
         yield Result(state=State.UNKNOWN, summary=_return_no_data_in_agent_output())
         return
+
+    checkdata = section[item]
     value = _get_value_from_checkdata(checkdata)
+
     if "\n" in value:
         summary = "Multiline output, see details"
         details = value
     else:
         summary = value
         details = None
+
     yield Result(state=State.OK, summary=summary, details=details)
+
     if params.get("expected_regex"):
         match = re.search(params["expected_regex"], value)
         yield Result(
@@ -74,14 +84,15 @@ def check_custom_sql_string(item, params, section):
         )
 
 
-register.check_plugin(
+# Register check plugin for custom SQL string
+check_plugin_custom_sql_string = CheckPlugin(
     name="custom_sql_string",
     sections=["custom_sql"],
     service_name="%s",
     discovery_function=discover_custom_sql_string,
     check_function=check_custom_sql_string,
-    check_default_parameters={},
     check_ruleset_name="custom_sql_string",
+    check_default_parameters={},
 )
 
 
@@ -92,13 +103,13 @@ def discover_custom_sql_number(section):
 
 
 def check_custom_sql_number(item, params, section):
-    try:
-        checkdata = section[item]
-        pp_checkdata = pprint.pformat(checkdata)
-    except KeyError:
+    """Check custom SQL number results with levels."""
+    if item not in section:
         yield Result(state=State.UNKNOWN, summary=_return_no_data_in_agent_output())
         return
 
+    checkdata = section[item]
+    pp_checkdata = pprint.pformat(checkdata)
     value = _get_value_from_checkdata(checkdata)
 
     if value is None:
@@ -112,9 +123,9 @@ def check_custom_sql_number(item, params, section):
     try:
         # Define the render function based on the presence of "unit"
         if checkdata.get("unit") is not None:
-            render_func = lambda v: "%.2f %s" % (v, checkdata["unit"])
+            render_func = lambda v: f"{v:.2f} {checkdata['unit']}"
         else:
-            render_func = lambda v: "%.2f" % v
+            render_func = lambda v: f"{v:.2f}"
 
         yield from check_levels(
             value,
@@ -134,14 +145,15 @@ def check_custom_sql_number(item, params, section):
         )
 
 
-register.check_plugin(
+# Register check plugin for custom SQL number
+check_plugin_custom_sql_number = CheckPlugin(
     name="custom_sql_number",
     sections=["custom_sql"],
     service_name="%s",
     discovery_function=discover_custom_sql_number,
     check_function=check_custom_sql_number,
-    check_default_parameters={},
     check_ruleset_name="custom_sql_number",
+    check_default_parameters={},
 )
 
 
@@ -152,8 +164,12 @@ def discover_custom_sql(section):
 
 
 def check_custom_sql(item, section):
+    """Check custom SQL results (fallback for untyped results)."""
+    if item not in section:
+        yield Result(state=State.UNKNOWN, summary=_return_no_data_in_agent_output())
+        return
+
     state = State.OK
-    # loop over all output lines of the agent
     checkdata = section[item]
     yield Result(
         state=state,
@@ -162,7 +178,8 @@ def check_custom_sql(item, section):
     )
 
 
-register.check_plugin(
+# Register check plugin for custom SQL (fallback)
+check_plugin_custom_sql = CheckPlugin(
     name="custom_sql",
     # sections=["custom_sql"],
     # Is there another option then using the complete item as service string? Maybe do  this step better here, then in the parse function:
@@ -171,5 +188,3 @@ register.check_plugin(
     discovery_function=discover_custom_sql,
     check_function=check_custom_sql,
 )
-
-
