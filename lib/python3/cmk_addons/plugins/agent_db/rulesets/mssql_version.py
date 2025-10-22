@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#!/usr/bin/env python3
-
 from cmk.rulesets.v1 import Title
 from cmk.rulesets.v1.rule_specs import (
     CheckParameters,
