@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
 
-from cmk.graphing.v1 import graphs, metrics, Title
+from cmk.graphing.v1 import graphs, metrics, perfometers, Title
 
 UNIT_TIME = metrics.Unit(metrics.TimeNotation())
 
@@ -22,4 +22,13 @@ graph_db_connection_time = graphs.Graph(
     simple_lines=[
         "db_connect_time",
     ],
+)
+
+perfometer_db_connection_time = perfometers.Perfometer(
+    name="db_connection_time",
+    focus_range=perfometers.FocusRange(
+        perfometers.Closed(0),
+        perfometers.Closed(3),
+    ),
+    segments=["db_connect_time"],
 )
