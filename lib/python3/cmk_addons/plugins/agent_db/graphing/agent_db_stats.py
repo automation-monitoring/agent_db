@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-from cmk.gui.i18n import _
-
-from cmk.gui.plugins.metrics import (
-    metric_info,
+from cmk.graphing.v1 import Title
+from cmk.graphing.v1.metrics import (
+    Metric,
+    Unit,
+    Color,
+    StrictPrecision,
+    DecimalNotation
 )
+
 
 _statements = [
     "mssql_availability_groups",
@@ -57,8 +61,10 @@ _statements = [
 ]
 
 for statement in _statements:
-    metric_info[f"query_runtime_{statement}"] = {
-        "title": _(f"Query Runtime {statement}"),
-        "unit": "s",
-        "color": "#42fc9c",
-    }
+    metric_name = f"query_runtime_{statement}"
+    locals()[f"metric_{metric_name}"] = Metric(
+            name=metric_name,
+            title=Title(f"Query Runtime {statement}"),
+            unit=Unit(DecimalNotation("s")),
+            color=Color.LIGHT_GREEN,
+        )
