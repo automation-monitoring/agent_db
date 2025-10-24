@@ -50,7 +50,7 @@ FROM
 UNION
 
 SELECT
-    upper(i.INSTANCE_NAME) || '|' || 'PGA_info' || '|' || p.name || '|' || p.value AS result
+    upper(i.INSTANCE_NAME) || '|' || 'PGA_info' || '|' || p.name || '|' || p.value || '|' || p.unit AS result
 FROM
     v$instance i,
     v$pgastat p
