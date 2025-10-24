@@ -62,7 +62,7 @@ _statements = [
 
 for statement in _statements:
     metric_name = f"query_runtime_{statement}"
-    locals()[f"metric_{metric_name}"] = Metric(
+    globals()[f"metric_{metric_name}"] = Metric(
             name=metric_name,
             title=Title(f"Query Runtime {statement}"),
             unit=Unit(DecimalNotation("s")),
