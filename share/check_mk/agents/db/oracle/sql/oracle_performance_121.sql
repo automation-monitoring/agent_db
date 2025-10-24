@@ -49,6 +49,9 @@ FROM
 
 UNION
 
+-- The field p.unit is a pure guess. In all examples we had accessible, this results empty anyway.
+-- We do need something for the data structure expected by the builtin Checkmk plugin, though.
+-- Also, we did not want to edit the section in the agent_db code.
 SELECT
     upper(i.INSTANCE_NAME) || '|' || 'PGA_info' || '|' || p.name || '|' || p.value || '|' || p.unit AS result
 FROM
