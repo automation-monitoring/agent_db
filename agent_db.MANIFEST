@@ -172,7 +172,10 @@
                 '- Version 0.10.2: Pass passwords securely, fix crash when no '
                 'logging is set\n'
                 '- Version 0.10.3: Migrate remaining legacy plugins. This '
-                'version should be 2.4.0-ready\n',
+                'version should be 2.4.0-ready\n'
+                '- Version 0.10.4: Use Default Graph for db_connection_time to '
+                'show warn/crit again\n'
+                '           + Add manpages for Database Connection Time\n',
  'download_url': '',
  'files': {'agents': ['db/mysql/sql/mysql_capacity.sql',
                       'db/mysql/sql/mysql_slaves.sql',
@@ -268,7 +271,11 @@
                                   'agent_db/rulesets/mssql_maxservermem.py',
                                   'agent_db/rulesets/mssql_version.py',
                                   'agent_db/rulesets/postgres_cache_hitratio.py',
-                                  'agent_db/rulesets/postgres_txn_wraparound.py'],
+                                  'agent_db/rulesets/postgres_txn_wraparound.py',
+                                  'agent_db/checkman/mssql_connection_time',
+                                  'agent_db/checkman/mysql_connection_time',
+                                  'agent_db/checkman/oracle_connection_time',
+                                  'agent_db/checkman/postgres_connection_time'],
            'lib': ['python3/cmk/special_agents/agent_db.py',
                    'python3/cmk/special_agents/db/cmk_mysql.py',
                    'python3/cmk/special_agents/db/cmk_oracle.py',
@@ -278,7 +285,7 @@
                    'python3/cmk/special_agents/db/cache.py']},
  'name': 'agent_db',
  'title': 'Special Agent DB',
- 'version': '0.10.3',
+ 'version': '0.10.4',
  'version.min_required': '2.3.0p1',
  'version.packaged': '2.3.0p27',
  'version.usable_until': None}
