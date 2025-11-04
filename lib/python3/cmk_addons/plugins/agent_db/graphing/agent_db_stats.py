@@ -6,7 +6,7 @@ from cmk.graphing.v1.metrics import (
     Unit,
     Color,
     StrictPrecision,
-    DecimalNotation
+    DecimalNotation,
 )
 
 
@@ -63,8 +63,8 @@ _statements = [
 for statement in _statements:
     metric_name = f"query_runtime_{statement}"
     globals()[f"metric_{metric_name}"] = Metric(
-            name=metric_name,
-            title=Title(f"Query Runtime {statement}"),
-            unit=Unit(DecimalNotation("s")),
-            color=Color.LIGHT_GREEN,
-        )
+        name=metric_name,
+        title=Title(f"Query Runtime {statement}"),
+        unit=Unit(DecimalNotation("s")),
+        color=Color.LIGHT_GREEN,
+    )
