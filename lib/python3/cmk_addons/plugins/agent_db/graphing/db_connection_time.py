@@ -16,14 +16,6 @@ metric_db_connect_time = metrics.Metric(
     color=metrics.Color.BLUE,
 )
 
-graph_db_connection_time = graphs.Graph(
-    name="db_connection_time",
-    title=Title("Database connection time"),
-    simple_lines=[
-        "db_connect_time",
-    ],
-)
-
 perfometer_db_connection_time = perfometers.Perfometer(
     name="db_connection_time",
     focus_range=perfometers.FocusRange(
