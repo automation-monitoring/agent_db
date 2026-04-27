@@ -20,7 +20,7 @@ This special agent can simplify monitoring setups by directly connecting to supp
 - Security-Conscious: Ideal for environments where local agent and plugin installation is restricted.
 
 ## Thanks to:
-LHM (Landeshauptstadt Muenchen): This Checkmk Special Agent was developed in cooperation with the "Eigenbetrieb it@M" of the City of Munich.
+LHM (Landeshauptstadt Muenchen): This Checkmk Special Agent was funded and developed in collaboration with the [OSPO of the City of Munich](https://opensource.muenchen.de/software/checkmk.html).
 
 - Maximilian Sachmann & Sebastian Böhm for perfect requirements engineering and testing.
 - Konstantin Büttner as a first-class co-developer with great ideas.
