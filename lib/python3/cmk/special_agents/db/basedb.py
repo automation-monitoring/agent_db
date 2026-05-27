@@ -384,6 +384,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         if check_header == "custom_sql":
             checkoutput.update({"backend": self.backend})
             checkoutput.update({"backend_service_prefix": self.backend_service_prefix})
+            checkoutput.update({"db_cstr": self.db_cstr})
             checkoutput.update({"statement_name": check_header})
 
             checkoutput["result"] = list(
