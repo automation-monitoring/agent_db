@@ -28,7 +28,11 @@ def parse_custom_sql(string_table):
         if "item" not in json_content:
             # Multiple values per query are not supported yet
             continue
-        item = f"{json_content['backend_service_prefix']} Custom {json_content['item']}"
+            
+        if "instance_in_item" not in json_content:
+            item = f"{json_content['backend_service_prefix']} Custom {json_content['item']}"
+        else:
+            item = f"{json_content['backend_service_prefix']} {json_content['db_cstr'].upper()} Custom {json_content['item']}"
         ret.update({item: json_content})
     return ret
 
