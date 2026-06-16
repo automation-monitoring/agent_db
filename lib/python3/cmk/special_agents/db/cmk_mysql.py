@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # This file is part of the checkmk "Database Special Agent" agent_db (https://github.com/automation-monitoring/agent_db)
 
-import mysql.connector
+import pymysql
 import sys
 import time
 import inspect
@@ -55,15 +55,15 @@ class DBStrategy(basedb.BaseDBStrategy):
         connection_time = None
         try:
             start_connect = time.time()  # Record start time
-            self.connection = mysql.connector.connect(
+            self.connection = pymysql.connect(
                 user=db_user,
                 password=db_pass,
                 host=db_host,
                 port=db_port,
                 database=db_cstr,
-                connection_timeout=db_cursor_timeout_sec,
+                connect_timeout=db_cursor_timeout_sec,
             )
-        except mysql.connector.Error as e:
+        except pymysql.Error as e:
             if "timed out" in str(e).lower():
                 error_message = self.format_error_message(db_cstr, e, timeout=True)
             else:
