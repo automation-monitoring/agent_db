@@ -437,7 +437,20 @@ def main():
 
     log = AgentDBLog(f"{logpath}/{hostname}.log", loglevel)
 
+    # Determine which config file to use (priority order):
+    # 1. ~/etc/agent_db.yml (backwards compatibility)
+    # 2. ~/local/etc/agent_db.yml (custom config)
+    # 3. ~/local/etc/agent_db_default.yml (default config)
     configfile = f"{OMD_ROOT}/etc/agent_db.yml"
+    if os.path.exists(configfile):
+        log.log.info(f"Loading config from backwards compatibility path: {configfile}")
+    elif os.path.exists(f"{OMD_ROOT}/local/etc/agent_db.yml"):
+        configfile = f"{OMD_ROOT}/local/etc/agent_db.yml"
+        log.log.info(f"Loading config from: {configfile}")
+    else:
+        configfile = f"{OMD_ROOT}/local/etc/agent_db_default.yml"
+        log.log.info(f"Loading default config from: {configfile}")
+
     if os.path.exists(configfile):
         with open(configfile, "r") as f:
             statement_config = yaml.safe_load(f)
