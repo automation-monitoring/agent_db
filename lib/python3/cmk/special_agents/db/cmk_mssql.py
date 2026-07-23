@@ -226,16 +226,19 @@ class DBStrategy(basedb.BaseDBStrategy):
                 )
             return sql_output_string
 
-    @staticmethod
-    def query(cursor, sqlstatement):
+    def query(self, cursor, sqlstatement):
         if sqlstatement.startswith("BEGIN") or sqlstatement.startswith("DECLARE"):
             sqls = [sqlstatement]
         else:
             sqls = sqlstatement.split(";")
 
+        self.last_column_names = []
         for sql in sqls:
             cursor.execute(sql)
             while True:
+                self.last_column_names.append(
+                    self._column_names_from_cursor(cursor)
+                )
                 ret = cursor.fetchall()
                 yield ret
                 if not cursor.nextset():

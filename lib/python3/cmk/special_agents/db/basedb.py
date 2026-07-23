@@ -50,6 +50,13 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         self.db_cursor_timeout_sec = db_cursor_timeout_sec
         self.log.debug("Initializing Base DB Strategy")
 
+        # Populated by query() with the column names (from cursor.description)
+        # of the last executed statement, one tuple per executed SQL part.
+        # Used to resolve item_columns/value_column when they are given as
+        # column names instead of numeric indices. Postgres does not use this
+        # (its query() already yields the header row as part of the result).
+        self.last_column_names = None
+
         # Initialize the database connection
         # self.init_db_connection(db_host, db_user, db_pass, db_cstr, db_port)
 
@@ -421,7 +428,21 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         return separator
 
     @staticmethod
-    def query(cursor, sqlstatement):
+    def _column_names_from_cursor(cursor):
+        """
+        Read the column names of the last executed statement from the cursor's
+        DB-API "description" attribute (standard across psycopg2, pyodbc,
+        mysql-connector, cx_Oracle/oracledb, ...).
+
+        Returns:
+            tuple[str, ...] | None: Column names, or None if not available
+            (e.g. the statement did not return a result set).
+        """
+        if cursor.description is None:
+            return None
+        return tuple(desc[0] for desc in cursor.description)
+
+    def query(self, cursor, sqlstatement):
         """
         Run an SQL statement with an open cursor.
 
@@ -432,8 +453,10 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         else:
             sqls = sqlstatement.split(";")
 
+        self.last_column_names = []
         for sql in sqls:
             cursor.execute(sql)
+            self.last_column_names.append(self._column_names_from_cursor(cursor))
             ret = cursor.fetchall()
             yield ret
 
