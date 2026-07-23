@@ -49,6 +49,12 @@ def _return_no_data_in_agent_output():
 
 
 def _get_value_from_checkdata(checkdata):
+    # Multiline mode (item_columns + value_column configured in agent_db.yaml):
+    # the special agent already computed the value for this row/item.
+    if "value" in checkdata:
+        return checkdata["value"]
+
+    # Legacy/default mode: only the first row of the raw result is evaluated.
     if checkdata["backend"] == "postgres":
         value = checkdata["result"][0][1][0][0]
     else:
