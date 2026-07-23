@@ -551,7 +551,16 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 mtime_cache_file, cached_data = cache_result
                 stats["status"] = "OK"
                 stats["runtime"] = 0.0
-                results = cached_data
+                if isinstance(cached_data, dict) and "results" in cached_data:
+                    # Cache format written by this version (includes column names,
+                    # needed to resolve item_columns/value_column given as names).
+                    results = cached_data["results"]
+                    self.last_column_names = cached_data.get("column_names")
+                else:
+                    # Backward compatible with cache files written by older
+                    # agent_db versions (plain results list, no column names).
+                    results = cached_data
+                    self.last_column_names = None
                 self.print_db_stats(self.db_cstr, statement, stats)
                 return (results, mtime_cache_file)
 
@@ -571,7 +580,14 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 if cache_time_sec is not None and cache_key is not None:
                     # Write the result to cache
                     self.log.debug(f"Writing cache for: {cache_key}")
-                    cache.write_cache(self.cache_dir, cache_key, results)
+                    cache.write_cache(
+                        self.cache_dir,
+                        cache_key,
+                        {
+                            "results": results,
+                            "column_names": self.last_column_names,
+                        },
+                    )
             except Exception as e:
                 self.log.error(f"Error running query {statement}: {str(e)}")
                 stats["status"] = "CRIT"
