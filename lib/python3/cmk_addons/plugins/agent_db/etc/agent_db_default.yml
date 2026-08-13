@@ -288,15 +288,32 @@ cmk_postgres:
       packages:
         - basic
 
+    # Multiline custom_sql example:
+    # "select * from city limit 10" returns several rows with the columns
+    # (id, name, countrycode, district, population) at index 0..4.
+    #
+    # If "item_columns" and "value_column" are both set, agent_db switches
+    # into multiline mode: instead of using only the first row of the result
+    # (as with a static "item"), it creates ONE checkmk service per row.
+    #
+    # - item_columns:  list of 0-based column indices that are combined to
+    #                   build the item/service name (multiple columns allowed)
+    # - item_prefix:            optional text prepended to the item name
+    # - item_column_separator:  optional separator used to join item_columns
+    #                            and item_prefix (default: " ")
+    # - value_column:  0-based column index that contains the actual value
+    #                   to be checked (number or string)
+    #
+    # NOTE: item_columns/value_column and a static "item" are mutually
+    # exclusive. If "item_columns" and "value_column" are present, they take
+    # precedence and "item" is ignored.
     postgres_select_cities:
       separator: sep(0)
       check_header: custom_sql
-      #has_header_row: true
-      # if a item is defined, item_prefix, item_column, value_column are ignored
-      item: City population
-      #item_prefix: City
-      #item_column: name
-      #value_column: population
+      item_columns: [1]
+      item_prefix: City
+      item_column_separator: " "
+      value_column: 4
       timeout_sec: 2
       type: number
       metric: population
