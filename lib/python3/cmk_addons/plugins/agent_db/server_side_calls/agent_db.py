@@ -16,6 +16,40 @@ from cmk.server_side_calls.v1 import (
 )
 
 
+def _resolve_custom_host_attr(value, macros):
+    """Resolve "<<attr>>" from the host macros.
+
+    Checkmk provides a custom host attribute as macro $_HOST<attr>$ if the
+    attribute has "Make this variable available in monitoring as custom
+    macro" enabled. Unresolved values are returned unchanged, so the agent
+    can still fall back to the REST API.
+    """
+    if not (isinstance(value, str) and value.startswith("<<") and value.endswith(">>")):
+        return value
+    name = value[2:-2]
+    for key in (f"$_HOST{name}$", f"$_HOST{name.upper()}$"):
+        if key in macros:
+            return macros[key]
+    return value
+
+
+def resolve_custom_host_attrs(params, macros):
+    """Resolve "<<attr>>" values in the rule and backend parameters.
+
+    Same semantics as the agent: for db_cstr (a list) only the first
+    element is looked at and the whole list is replaced by the attribute
+    value (the agent splits it at ";").
+    """
+    for section in (params, params["db_backend"][1]):
+        for key, value in section.items():
+            if key == "db_cstr" and isinstance(value, list) and value:
+                resolved = _resolve_custom_host_attr(value[0], macros)
+                if resolved != value[0]:
+                    section[key] = resolved
+            else:
+                section[key] = _resolve_custom_host_attr(value, macros)
+
+
 def generate_agent_db_commands(params, host_config):
     password_arg = params["password"]
 
@@ -34,6 +68,8 @@ def generate_agent_db_commands(params, host_config):
         if "asm_credentials" in oracle_params:
             asm_pw = oracle_params["asm_credentials"]["asm_password"]
             del oracle_params["asm_credentials"]["asm_password"]
+
+    resolve_custom_host_attrs(params_b64, host_config.macros)
 
     # Dump params to JSON and serialize to a base64 string
     json_params = json.dumps(params_b64)
