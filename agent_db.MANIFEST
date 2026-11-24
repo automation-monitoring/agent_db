@@ -186,7 +186,11 @@
                 'mkp package and adjust config load logic\n'
                 '           + Fix issues #7 - switch to pymysql module\n'
                 '- Version 1.1.1: New location for default config '
-                'cmk_addons/plugins/agent_db/etc/agent_db_default.yml \n',
+                'cmk_addons/plugins/agent_db/etc/agent_db_default.yml\n'
+                '- Version 1.1.2: Fix custom host attributes (<<attr>>) on '
+                'Checkmk 2.4+ (HTTP 401): resolved via host macros\n'
+                '           + Enable "Make this variable available in '
+                'monitoring as custom macro" for the attribute\n',
  'download_url': 'https://github.com/automation-monitoring/agent_db',
  'files': {'agents': ['db/mysql/sql/mysql_capacity.sql',
                       'db/mysql/sql/mysql_slaves.sql',
@@ -298,7 +302,7 @@
                    'python3/cmk/special_agents/db/cache.py']},
  'name': 'agent_db',
  'title': 'Special Agent DB',
- 'version': '1.1.1',
+ 'version': '1.1.2',
  'version.min_required': '2.3.0p1',
- 'version.packaged': '2.4.0p11',
+ 'version.packaged': 'cmk-mkp-tool 3.0.0',
  'version.usable_until': None}
