@@ -212,14 +212,34 @@ def resolve_custom_host_attr(param, value, hostname):
         value = value[0]
 
     if isinstance(value, str) and value.startswith("<<") and value.endswith(">>"):
+        # Normally already resolved from the host macros by the server side
+        # call; the REST API is only a fallback for attributes without macro.
         custom_host_attr = value.strip("<<>>")
-        cmkinst = CMKInstance()
-        custom_host_attr_value = cmkinst.get_custom_host_attr(
-            hostname, custom_host_attr
+        hint = (
+            f"Custom host attribute '{custom_host_attr}' is not available as "
+            f"host macro for {hostname}. Check that the attribute is set on the "
+            "host, its name is spelled correctly and 'Make this variable "
+            "available in monitoring as custom macro' is enabled, then "
+            "activate changes."
         )
+        secret = _get_automation_secret()
+        if not secret:
+            AgentDBLog.log_error_and_exit(
+                f"{hint} (REST API fallback not possible: no automation.secret)"
+            )
+        cmkinst = CMKInstance(password=secret)
+        try:
+            custom_host_attr_value = cmkinst.get_custom_host_attr(
+                hostname, custom_host_attr
+            )
+        except requests.exceptions.HTTPError as e:
+            status = e.response.status_code
+            cause = "; automation secret outdated?" if status == 401 else ""
+            AgentDBLog.log_error_and_exit(
+                f"{hint} (REST API fallback failed: HTTP {status} "
+                f"{e.response.reason}{cause})"
+            )
         return custom_host_attr_value
-    # Instead of using the cmk api, it would be better to use the cmk.base.config module, but it doesn't seem to work for custom host attributes at the moment
-    # test = config.CEEHostConfig(config_cache=config_cache, hostname="db-oracle")
 
     return None  # Return None if no conditions are met or the value is not resolved
 
