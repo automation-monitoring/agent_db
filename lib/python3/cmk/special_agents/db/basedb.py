@@ -355,7 +355,12 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         )
 
         self._output_result(
-            check_header, result, state_statement_cfg, mtime_cache_file, cache_time_sec
+            check_header,
+            result,
+            state_statement_cfg,
+            mtime_cache_file,
+            cache_time_sec,
+            statement_name,
         )
 
     def _output_result(
@@ -365,6 +370,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         state_statement_cfg,
         mtime_cache_file,
         cache_time_sec,
+        statement_name=None,
     ):
         """
         Output the result of the executed statement.
@@ -375,6 +381,8 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             state_statement_cfg (dict): Configuration of the current statement.
             mtime_cache_file: Modification time of the cache file.
             cache_time_sec: Cache time in seconds.
+            statement_name (str): Name of the statement in agent_db.yml, used
+                in error messages (defaults to check_header).
 
         Returns:
             None
@@ -397,7 +405,10 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 # Multiline mode: the statement is allowed to return more than
                 # one row. Each row becomes its own checkmk service/item.
                 self._output_custom_sql_multiline(
-                    check_header, result_list, state_statement_cfg
+                    check_header,
+                    result_list,
+                    state_statement_cfg,
+                    statement_name or check_header,
                 )
             else:
                 # Legacy/default mode: only the first row of the result is used
@@ -486,7 +497,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             return None
         return column_names[0]
 
-    def _resolve_custom_sql_column(self, column_ref, column_names, check_header):
+    def _resolve_custom_sql_column(self, column_ref, column_names, statement_name):
         """
         Resolve one item_columns/value_column entry from agent_db.yaml to a
         numeric column index.
@@ -496,7 +507,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 column name as it appears in the SQL result.
             column_names (tuple[str, ...] | None): Column names for the
                 current statement, or None if unavailable.
-            check_header (str): Statement name, used for error messages only.
+            statement_name (str): Statement name, used for error messages only.
 
         Returns:
             int: The resolved 0-based column index.
@@ -508,7 +519,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             # bool is a subclass of int in Python; guard against silently
             # accepting True/False as column index 1/0.
             raise ValueError(
-                f"Statement {check_header}: item_columns/value_column entries "
+                f"Statement {statement_name}: item_columns/value_column entries "
                 f"must be an integer index or a column name string, "
                 f"got: {column_ref!r}"
             )
@@ -519,7 +530,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
         if isinstance(column_ref, str):
             if column_names is None:
                 raise ValueError(
-                    f"Statement {check_header}: column name '{column_ref}' was "
+                    f"Statement {statement_name}: column name '{column_ref}' was "
                     f"used in item_columns/value_column, but no column names "
                     f"could be determined for this statement/backend. Use a "
                     f"numeric column index instead, or check the SQL statement."
@@ -528,17 +539,19 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 return column_names.index(column_ref)
             except ValueError:
                 raise ValueError(
-                    f"Statement {check_header}: column '{column_ref}' not "
+                    f"Statement {statement_name}: column '{column_ref}' not "
                     f"found in result columns {list(column_names)}."
                 )
 
         raise ValueError(
-            f"Statement {check_header}: item_columns/value_column entries "
+            f"Statement {statement_name}: item_columns/value_column entries "
             f"must be an integer index or a column name string, "
             f"got: {column_ref!r}"
         )
 
-    def _output_custom_sql_multiline(self, check_header, result_list, state_statement_cfg):
+    def _output_custom_sql_multiline(
+        self, check_header, result_list, state_statement_cfg, statement_name
+    ):
         """
         Output one JSON line per data row for a custom_sql statement configured
         for multiline mode (item_columns + value_column in agent_db.yaml).
@@ -560,6 +573,8 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 list(self.output_statement_result(...)) for this statement.
             state_statement_cfg (dict): Configuration of the current statement
                 from agent_db.yaml (must contain "item_columns" and "value_column").
+            statement_name (str): Name of the statement in agent_db.yml, used
+                in error messages.
 
         Returns:
             None
@@ -573,7 +588,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
 
         if not data_rows:
             self.log.debug(
-                f"Statement {check_header}: no data rows returned, nothing to output "
+                f"Statement {statement_name}: no data rows returned, nothing to output "
                 f"for multiline custom_sql."
             )
             return
@@ -582,11 +597,11 @@ class BaseDBStrategy(agent_db.AgentDBLog):
 
         try:
             item_columns = [
-                self._resolve_custom_sql_column(col, column_names, check_header)
+                self._resolve_custom_sql_column(col, column_names, statement_name)
                 for col in item_columns_cfg
             ]
             value_column = self._resolve_custom_sql_column(
-                value_column_cfg, column_names, check_header
+                value_column_cfg, column_names, statement_name
             )
         except ValueError as e:
             self.log.error(str(e))
@@ -597,7 +612,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 item_parts = [str(row[idx]).strip() for idx in item_columns]
             except IndexError:
                 self.log.error(
-                    f"Statement {check_header}: item_columns {item_columns} out of "
+                    f"Statement {statement_name}: item_columns {item_columns} out of "
                     f"range for row with {len(row)} columns: {row}"
                 )
                 continue
@@ -610,7 +625,7 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 value = row[value_column]
             except IndexError:
                 self.log.error(
-                    f"Statement {check_header}: value_column {value_column} out of "
+                    f"Statement {statement_name}: value_column {value_column} out of "
                     f"range for row with {len(row)} columns: {row}"
                 )
                 continue
