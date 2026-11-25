@@ -576,6 +576,10 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             statement_name (str): Name of the statement in agent_db.yml, used
                 in error messages.
 
+        Configuration errors (unknown column, index out of range) are logged
+        and reported as failed statement in the agent_db_stats section, so
+        they show up in the "Agent DB Stats" service.
+
         Returns:
             None
         """
@@ -604,17 +608,19 @@ class BaseDBStrategy(agent_db.AgentDBLog):
                 value_column_cfg, column_names, statement_name
             )
         except ValueError as e:
-            self.log.error(str(e))
+            self._report_custom_sql_error(statement_name, str(e), state_statement_cfg)
             return
 
+        errors = []
         for row in data_rows:
             try:
                 item_parts = [str(row[idx]).strip() for idx in item_columns]
             except IndexError:
-                self.log.error(
+                errors.append(
                     f"Statement {statement_name}: item_columns {item_columns} out of "
-                    f"range for row with {len(row)} columns: {row}"
+                    f"range for row with {len(row)} columns"
                 )
+                self.log.error(f"{errors[-1]}: {row}")
                 continue
 
             item_name = item_column_separator.join(item_parts)
@@ -624,10 +630,11 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             try:
                 value = row[value_column]
             except IndexError:
-                self.log.error(
+                errors.append(
                     f"Statement {statement_name}: value_column {value_column} out of "
-                    f"range for row with {len(row)} columns: {row}"
+                    f"range for row with {len(row)} columns"
                 )
+                self.log.error(f"{errors[-1]}: {row}")
                 continue
 
             row_checkoutput = {
@@ -643,6 +650,34 @@ class BaseDBStrategy(agent_db.AgentDBLog):
             row_checkoutput["value"] = value
 
             sys.stdout.write(json.dumps(row_checkoutput) + "\n")
+
+        if errors:
+            self._report_custom_sql_error(
+                statement_name,
+                f"{errors[0]} ({len(errors)} of {len(data_rows)} rows skipped)",
+                state_statement_cfg,
+                log=False,
+            )
+
+    def _report_custom_sql_error(self, statement_name, message, state_statement_cfg, log=True):
+        """
+        Report a multiline custom_sql configuration error: log it and mark the
+        statement as failed in the agent_db_stats section. The stats check
+        merges the entries per statement, so this one replaces the "OK"
+        written by exec_sql() and "Agent DB Stats" goes CRIT.
+        """
+        if log:
+            self.log.error(message)
+        self.print_db_stats(
+            self.db_cstr,
+            statement_name,
+            {
+                "status": "CRIT",
+                "runtime": None,
+                "exception": message,
+                "timeout": state_statement_cfg.get("timeout_sec"),
+            },
+        )
 
     @property
     def separator_char(self):
