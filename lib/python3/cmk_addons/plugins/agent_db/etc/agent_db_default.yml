@@ -288,34 +288,43 @@ cmk_postgres:
       packages:
         - basic
 
-    # Multiline custom_sql example:
-    # "select * from city limit 10" returns several rows with the columns
-    # (id, name, countrycode, district, population) at index 0..4.
-    #
-    # If "item_columns" and "value_column" are both set, agent_db switches
-    # into multiline mode: instead of using only the first row of the result
-    # (as with a static "item"), it creates ONE checkmk service per row.
-    #
-    # - item_columns:  list of 0-based column indices that are combined to
-    #                   build the item/service name (multiple columns allowed)
-    # - item_prefix:            optional text prepended to the item name
-    # - item_column_separator:  optional separator used to join item_columns
-    #                            and item_prefix (default: " ")
-    # - value_column:  0-based column index that contains the actual value
-    #                   to be checked (number or string)
-    #
-    # NOTE: item_columns/value_column and a static "item" are mutually
-    # exclusive. If "item_columns" and "value_column" are present, they take
-    # precedence and "item" is ignored.
+    # Single row custom_sql: static "item", only the first row is used.
     postgres_select_cities:
       separator: sep(0)
       check_header: custom_sql
-      item_columns: [1]
-      item_prefix: City
-      item_column_separator: " "
-      value_column: 4
+      item: City population
       timeout_sec: 2
       type: number
       metric: population
       packages:
         - basic
+
+    # Multiline custom_sql example (package custom_multiline, not active by
+    # default): one service per result row of
+    # "select name, population from city order by name".
+    #
+    # If "item_columns" and "value_column" are both set, agent_db switches
+    # into multiline mode and a static "item" is ignored.
+    #
+    # - item_columns:  list of columns combined to the item/service name,
+    #                  each a 0-based index or a column name (mixing is fine)
+    # - value_column:  column with the value to check (index or name),
+    #                  number or string depending on "type"
+    # - item_prefix:            optional text prepended to the item name
+    # - item_column_separator:  optional separator used to join item_columns
+    #                           and item_prefix (default: " ")
+    #
+    # Column names as the database reports them: Oracle uses upper case
+    # (NAME, POPULATION) unless the column alias is quoted.
+    # Unknown columns are reported in the "Agent DB Stats" service.
+    postgres_select_cities_multiline:
+      separator: sep(0)
+      check_header: custom_sql
+      item_columns: [name]
+      item_prefix: City
+      value_column: population
+      timeout_sec: 2
+      type: number
+      metric: population
+      packages:
+        - custom_multiline
