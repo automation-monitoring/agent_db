@@ -20,9 +20,9 @@ def _resolve_custom_host_attr(value, macros):
     """Resolve "<<attr>>" from the host macros.
 
     Checkmk provides a custom host attribute as macro $_HOST<attr>$ if the
-    attribute has "Make this variable available in monitoring as custom
-    macro" enabled. Unresolved values are returned unchanged, so the agent
-    can still fall back to the REST API.
+    attribute has "Add to monitoring configuration" enabled. Unresolved
+    values are returned unchanged, so the agent can still fall back to the
+    REST API.
     """
     if not (isinstance(value, str) and value.startswith("<<") and value.endswith(">>")):
         return value

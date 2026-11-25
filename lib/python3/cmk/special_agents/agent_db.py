@@ -218,9 +218,8 @@ def resolve_custom_host_attr(param, value, hostname):
         hint = (
             f"Custom host attribute '{custom_host_attr}' is not available as "
             f"host macro for {hostname}. Check that the attribute is set on the "
-            "host, its name is spelled correctly and 'Make this variable "
-            "available in monitoring as custom macro' is enabled, then "
-            "activate changes."
+            "host, its name is spelled correctly and 'Add to monitoring "
+            "configuration' is enabled for the attribute, then activate changes."
         )
         secret = _get_automation_secret()
         if not secret:
