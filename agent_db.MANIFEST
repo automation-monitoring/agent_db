@@ -1,6 +1,12 @@
 {'author': 'Philipp Lemke <pl@automation-monitoring.com>',
  'description': '| Version | Changes |\n'
                 '| ------- | ------- |\n'
+                '| 1.2.1 | Custom SQL examples (City population, Count Tables, '
+                'Count Databases, Table Comments) moved from basic to the new '
+                'package examples, no more CRIT Agent DB Stats on databases '
+                'without table city; Fix packages list of '
+                'postgres_txn_wraparound; README links to the wiki Quick-Start '
+                '|\n'
                 '| 1.2.0 | Multiline custom SQL: one service per result row '
                 'via item_columns and value_column (column index or name), '
                 'contributed by maxiking203; Multiline configuration errors '
@@ -163,7 +169,7 @@
                    'python3/cmk/special_agents/db/cache.py']},
  'name': 'agent_db',
  'title': 'Special Agent DB',
- 'version': '1.2.0',
+ 'version': '1.2.1',
  'version.min_required': '2.3.0p1',
  'version.packaged': 'cmk-mkp-tool 3.0.0',
  'version.usable_until': None}
