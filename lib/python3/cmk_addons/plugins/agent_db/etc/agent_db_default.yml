@@ -282,7 +282,7 @@ cmk_postgres:
     postgres_txn_wraparound:
       timeout_sec: 2
       packages:
-        -basic
+        - basic
     postgres_cus_count_tables:
       separator: sep(0)
       check_header: custom_sql
