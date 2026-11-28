@@ -1,3 +1,8 @@
+# Custom SQL examples (mysql_count_databases, mysql_table_comments,
+# postgres_cus_count_tables, postgres_select_cities) are in the package
+# "examples": select it under "Custom Statement Packages" in the rule to try
+# them. postgres_select_cities needs a table "city".
+
 # Default packages -> available for all backends:
 #    - basic
 #    - standard
@@ -220,7 +225,7 @@ cmk_mysql:
       timeout_sec: 2
       type: number
       metric: dbs
-      packages: [basic]
+      packages: [examples]
 
     mysql_table_comments:
       separator: sep(0)
@@ -228,7 +233,7 @@ cmk_mysql:
       item: Table Comments
       timeout_sec: 2
       unit: string
-      packages: [basic]
+      packages: [examples]
 
 cmk_postgres:
   default_separator: sep(59)
@@ -286,7 +291,7 @@ cmk_postgres:
       type: number
       metric: tables
       packages:
-        - basic
+        - examples
 
     # Single row custom_sql: static "item", only the first row is used.
     postgres_select_cities:
@@ -297,7 +302,7 @@ cmk_postgres:
       type: number
       metric: population
       packages:
-        - basic
+        - examples
 
     # Multiline custom_sql example (package custom_multiline, not active by
     # default): one service per result row of
